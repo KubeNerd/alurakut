@@ -6,9 +6,14 @@ import { ProfileRelationsBoxWrapper } from "../src/components/ProfileRelations";
 function ProfileSidebar(props) {
 
   return (
-    <ProfileRelationsBoxWrapper>
+    <Box>
       <img src={`http://github.com/${props.githubUser}.png`} style={{ borderRadius: '8px' }} />
-    </ProfileRelationsBoxWrapper>
+      <hr />
+      <a className="boxLink" href={`https://github.com/${props.githubUser}`}>
+        @{props.githubUser}
+      </a>
+
+    </Box>
   )
 }
 
@@ -32,8 +37,30 @@ export default function Home() {
         <div className="welcomeArea" style={{ gridArea: "welcomeArea" }}>
           <Box>
             <h1 className="title">Bem vindo(a)</h1>
-            <OrkutNostalgicIconSet/>
+            <OrkutNostalgicIconSet />
           </Box>
+
+          <Box>
+            <h2 className="subTitle">Oque você deseja fazer ?</h2>
+            <form onSubmit={(e) =>{
+              e.preventDefault();
+            }}>
+              <input
+                  placeholder="Qual vai ser o nome da sua comunidade ?"
+                  name="title"
+                  aria-label="Qual vai ser o nome da sua comunidade ?" 
+                />
+
+
+                <input
+                  placeholder="Qual URL vamos usar de capa nessa comunidade ?"
+                  name="image"
+                  aria-label="Qual URL vamos usar de capa nessa comunidade ?" 
+                />
+                <button>Criar comunidade</button>
+            </form>
+          </Box>
+
         </div>
 
         <div className="profileRelationsArea" style={{ gridArea: "profileRelationsArea" }} >
@@ -42,20 +69,20 @@ export default function Home() {
               Pessoas da Comunidades ({pessoasFavoritas.length})
             </h2>
             <ul>
-              
+
               {pessoasFavoritas.map((itemAtual) => {
-              return (
-                <li>
-                  <a href={`/users/${itemAtual}`} key={itemAtual}>
+                return (
+                  <li>
+                    <a href={`/users/${itemAtual}`} key={itemAtual}>
                       <img src={`https://github.com/${itemAtual}.png`} />
                       <span>{itemAtual}</span>
-                  </a>
+                    </a>
 
-                </li>
+                  </li>
                 )
-                })}
+              })}
 
-              
+
             </ul>
 
 
