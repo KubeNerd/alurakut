@@ -29,19 +29,7 @@ function ProfileRelationsBox(props){
     <h2 className="smallTitle">
       {props.title} ({ props.items.length })
     </h2>
-    {/* <ul>
-      {pessoasFavoritas.map((itemAtual) => {
-        return (
-          <li>
-            <a href={`/users/${itemAtual}`} key={itemAtual}>
-              <img src={`https://github.com/${itemAtual}.png`} />
-              //<span>{itemAtual}</span>
-            </a>
 
-          </li>
-        )
-      })}
-    </ul> */}
    </ProfileRelationsBoxWrapper>
   )
 }
@@ -120,14 +108,24 @@ React.useEffect(() =>{
               const dadosDoForm = new FormData(e.target);
 
               const comunidade = {
-                id:new Date().toISOString(),
                 title: dadosDoForm.get('title'),
                 imageUrl: dadosDoForm.get('image'),
-                paginaUrl: dadosDoForm.get('url')
+                creatorSlug:githubUser,
               }
-              const comunidadesAtualizadas = [...comunidades, comunidade];
-              setComunidades(comunidadesAtualizadas);
-  
+
+              fetch("/api/comunidades", {
+                method:"POST",
+                headers:{
+                  'Content-Type':'application/json'
+                },
+                body:JSON.stringify(comunidade)
+              }).then(async (response) =>{
+                const dados = await response.json();
+                console.log(dados)
+                const comunidadesAtualizadas = [...comunidades, comunidade];
+                setComunidades(comunidadesAtualizadas);
+              })
+ 
     
             }}>
               <input
