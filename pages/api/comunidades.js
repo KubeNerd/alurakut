@@ -1,10 +1,12 @@
 import { SiteClient } from "datocms-client";
 
 export default async function receberDadosDaRequests(request, response){
-    const TOKEN = "b47fb99930fcbfe16aecca35834ee3";
+    const TOKEN = "21b498e2542638e70e58fda9917314";
     const client = new SiteClient(TOKEN);
 
-   if(request.method === "POST"){
+   console.log('DatoCMS body ',request.body);
+   
+   if(request.method == "POST"){
     
     const registroCriado = await client.items.create({
         itemType:"1859205",
@@ -17,16 +19,11 @@ export default async function receberDadosDaRequests(request, response){
      response.json({
         registroCriado:registroCriado
     });
-
     return;
-
   }
 
-
-
-
   response.status(404).json({
-      message:"Ainda não temos nada no GET, mas no POST tem"
+      message:"Ainda não temos nada no GET, mas no POST tem",
   })
 
 }

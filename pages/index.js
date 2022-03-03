@@ -3,7 +3,8 @@ import MainGrid from "../src/components/MainGrid";
 import Box from "../src/components/Box";
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from "../src/lib/AluraCommons";
 import { ProfileRelationsBoxWrapper } from "../src/components/ProfileRelations";
-
+import nookies from "nookies";
+import jwt from "jsonwebtoken";
 
 function ProfileSidebar(props) {
   //`https://place-hold.it/300x250`
@@ -26,7 +27,7 @@ function ProfileSidebar(props) {
 function ProfileRelationsBox(props){
   return(
     <ProfileRelationsBoxWrapper >
-    <h2 className="smallTitle">
+    <h2 className="smallTitle" key={props.id}>
       {props.title} ({ props.items.length })
     </h2>
 
@@ -34,15 +35,15 @@ function ProfileRelationsBox(props){
   )
 }
 
-export default function Home() {
+export default function Home(props) {
 
   const [comunidades, setComunidades] = useState([]);
 
   
-  const githubUser = 'shabazzBr';
+  const githubUser = props.githubUser;
 
   const pessoasFavoritas = [
-    'omariosouto', 'peas', 'marcus', 'ana', 'catia'
+    'omariosouto', 'peas', 'vkorbes', 'yr-samuel', 'vsamarcus'
   ];
 
 
@@ -67,15 +68,14 @@ React.useEffect(() =>{
  fetch(`https://graphql.datocms.com`, {
    method:'POST',
    headers:{
-     'Authorization':`21b498e2542638e70e58fda9917314`,
+     'Authorization':'21b498e2542638e70e58fda9917314',
      'Content-Type':'application/json'
    },
    body:JSON.stringify({ "query":`query {
     allCommunities {
       id,
       title,
-      imageUrl,
-      creatorslug
+      imageUrl
     }
 
    }`})
@@ -171,8 +171,8 @@ React.useEffect(() =>{
             <ul>
               {pessoasFavoritas.map((itemAtual) => {
                 return (
-                  <li>
-                    <a href={`/users/${itemAtual}`} key={itemAtual}>
+                  <li key={itemAtual}>
+                    <a href={`/users/${itemAtual}`}>
                       <img src={`https://github.com/${itemAtual}.png`} />
                       <span>{itemAtual}</span>
                     </a>
@@ -182,12 +182,40 @@ React.useEffect(() =>{
               })}
             </ul>
           </ProfileRelationsBoxWrapper>
-
-
-
         </div>
 
       </MainGrid>
     </div>
   )
+}
+
+
+export async function getServerSideProps(context){
+  const cookies = nookies.get(context);
+  const token = cookies.USER_TOKEN;
+  
+
+  const  isAuthenticated =  fetch("/api/auth", {
+    headers:{
+      Authorization:token
+    }
+  })
+  .then((resposta) => resposta.json())
+
+  if(!isAuthenticated){
+    return{
+      redirect : {
+        destination:'/login',
+        permanent:false,
+      }
+    }
+  }
+
+  const { githubUser } = jwt.decode(token);
+
+  return{
+    props:{
+      githubUser
+    },
+  }
 }
