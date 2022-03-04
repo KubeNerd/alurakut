@@ -1,13 +1,15 @@
 import jwt from "jsonwebtoken";
 
 export default async function Auth(request, response){
+    console.log(request.body)
     const { githubUser } = request.body;
-    if(request.method === "POST"){
-        const token = jwt.sign({ githubUser }, { secret:'sdkaskdasdasdasdasdasds'}, {
-            expiresIn: 300999
-        });
 
-        return response.json({
+    if(request.method === "POST"){
+        const token = jwt.sign({ githubUser },'e8d95a51f3af4a3b134bf6bb680a213a', {
+            expiresIn: 300999
+        })
+
+     response.json({
             isAuthenticated:true,
             token,
             roles: [
@@ -15,7 +17,7 @@ export default async function Auth(request, response){
               ]
         })
     }
-    return response.json({
+   response.json({
         isAuthenticated:false
     })
 
