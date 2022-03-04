@@ -1,10 +1,8 @@
 import { SiteClient } from "datocms-client";
-
 export default async function receberDadosDaRequests(request, response){
     const TOKEN = "21b498e2542638e70e58fda9917314";
     const client = new SiteClient(TOKEN);
-
-   console.log('DatoCMS body ',request.body);
+    
    
    if(request.method == "POST"){
     

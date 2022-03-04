@@ -43,7 +43,8 @@ export default function Home(props) {
   const githubUser = props.githubUser;
 
   const pessoasFavoritas = [
-    'omariosouto', 'peas', 'vkorbes', 'yr-samuel', 'vsamarcus'
+    'omariosouto', 'peas', 'vkorbes', 'yr-samuel', 'vsamarcus',   
+    'juunegreiros'
   ];
 
 
@@ -53,7 +54,7 @@ export default function Home(props) {
 const [seguidores, setSeguidores] = useState([]);
 
 React.useEffect(() =>{
-  fetch(`https://api.github.com/users/shabazzBr`)
+  fetch(`https://api.github.com/users/${githubUser}/followers`)
     .then((respostaDoServidor) =>{
       return respostaDoServidor.json();
     })
@@ -69,7 +70,8 @@ React.useEffect(() =>{
    method:'POST',
    headers:{
      'Authorization':'21b498e2542638e70e58fda9917314',
-     'Content-Type':'application/json'
+     'Content-Type':'application/json',
+     'Accept': 'application/json',
    },
    body:JSON.stringify({ "query":`query {
     allCommunities {
@@ -103,30 +105,33 @@ React.useEffect(() =>{
 
           <Box>
             <h2 className="subTitle">Oque você deseja fazer ?</h2>
-            <form onSubmit={function handleCriarComunidade(e) {
-              e.preventDefault();
-              const dadosDoForm = new FormData(e.target);
+            <form onSubmit={function handleCriaComunidade(e) {
+                e.preventDefault();
+                const dadosDoForm = new FormData(e.target);
 
-              const comunidade = {
-                title: dadosDoForm.get('title'),
-                imageUrl: dadosDoForm.get('image'),
-                creatorSlug:githubUser,
-              }
+                console.log('Campo: ', dadosDoForm.get('title'));
+                console.log('Campo: ', dadosDoForm.get('image'));
 
-              fetch("/api/comunidades", {
-                method:"POST",
-                headers:{
-                  'Content-Type':'application/json'
-                },
-                body:JSON.stringify(comunidade)
-              }).then(async (response) =>{
-                const dados = await response.json();
-                console.log(dados)
-                const comunidadesAtualizadas = [...comunidades, comunidade];
-                setComunidades(comunidadesAtualizadas);
-              })
- 
-    
+                const comunidade = {
+                  title: dadosDoForm.get('title'),
+                  imageUrl: dadosDoForm.get('image'),
+                  creatorSlug: githubUser,
+                }
+
+                fetch('/api/comunidades', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(comunidade)
+                })
+                .then(async (response) => {
+                  const dados = await response.json();
+                  window.location.reload();
+                  const comunidade = dados.registroCriado;
+                  const comunidadesAtualizadas = [...comunidades, comunidade];
+                  setComunidades(comunidadesAtualizadas)
+                })
             }}>
               <input
                 placeholder="Qual vai ser o nome da sua comunidade ?"
@@ -149,7 +154,8 @@ React.useEffect(() =>{
           <ProfileRelationsBox title="seguidores" items={seguidores}/>
           <ProfileRelationsBoxWrapper>
             <ul>
-              {comunidades.map((itemAtual) => {
+              {comunidades.slice(0,6).map((itemAtual) => {
+           
                 return (
                   <li key={itemAtual.id}>
                     <a href={`/users/${itemAtual.id}`}>
@@ -190,28 +196,30 @@ React.useEffect(() =>{
 }
 
 
-export async function getServerSideProps(context){
+export  function getServerSideProps(context){
   const cookies = nookies.get(context);
   const token = cookies.USER_TOKEN;
-  
+  const decodedToken = jwt.decode(token);
+  const githubUser = decodedToken?.githubUser;
+  // const { githubUser } = jwt.decode(token); 
 
-  const  isAuthenticated =  fetch("/api/auth", {
-    headers:{
-      Authorization:token
-    }
-  })
-  .then((resposta) => resposta.json())
+  // const isAuthenticated =  fetch("/api/auth", {
+  //   headers:{
+  //     Authorization:token
+  //   }
+  // })
+  // .then((resposta) => resposta.json())
 
-  if(!isAuthenticated){
-    return{
-      redirect : {
-        destination:'/login',
-        permanent:false,
-      }
+  if (!githubUser) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
     }
   }
 
-  const { githubUser } = jwt.decode(token);
+ 
 
   return{
     props:{
