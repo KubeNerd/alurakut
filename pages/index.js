@@ -118,7 +118,7 @@ React.useEffect(() =>{
                   creatorSlug: githubUser,
                 }
 
-                fetch('/api/comunidades', {
+                 fetch('/api/comunidades', {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
@@ -127,12 +127,12 @@ React.useEffect(() =>{
                 })
                 .then(async (response) => {
                   const dados = await response.json();
-                  window.location.reload();
                   const comunidade = dados.registroCriado;
                   const comunidadesAtualizadas = [...comunidades, comunidade];
                   setComunidades(comunidadesAtualizadas)
                 })
-            }}>
+
+            }}> 
               <input
                 placeholder="Qual vai ser o nome da sua comunidade ?"
                 name="title"
@@ -154,7 +154,7 @@ React.useEffect(() =>{
           <ProfileRelationsBox title="seguidores" items={seguidores}/>
           <ProfileRelationsBoxWrapper>
             <ul>
-              {comunidades.slice(0,6).map((itemAtual) => {
+              {comunidades.map((itemAtual) => {
            
                 return (
                   <li key={itemAtual.id}>
